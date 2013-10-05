@@ -52,8 +52,8 @@ let g:airline_detect_paste=1
 
 let g:syntastic_enable_signs=1
 
-let g:airline_left_sep = '»'
-let g:airline_right_sep = '«'
+"let g:airline_left_sep = '»'
+"let g:airline_right_sep = '«'
 
 let g:airline_powerline_fonts=0
 

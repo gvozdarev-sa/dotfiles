@@ -3,6 +3,8 @@ if [ -f /etc/profile.d/bash-completion.sh ]; then
 fi
 
 xhost +local:root > /dev/null 2>&1
+export TERM='xterm-256color'
+
 
 complete -cf sudo
 
@@ -153,7 +155,6 @@ function prompt_command {
 PROMPT_COMMAND=prompt_command
 # set new b/w prompt (will be overwritten in 'prompt_command' later for color prompt)
 PS1='\u@\h:\w\$ '
-                                                                        }
 
 # ex - archive extractor
 # usage: ex <file>
