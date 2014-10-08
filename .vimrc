@@ -82,6 +82,16 @@ endif
 " Required:
 call neobundle#rc(expand('~/.vim/bundle/'))
 
+NeoBundle 'mhinz/vim-startify'             " Nice start screen
+let g:startify_bookmarks = ['~/.vimrc',]
+let g:startify_change_to_dir = 0
+let g:startify_files_number = 8
+let g:startify_skiplist = ['vimrc',]
+
+NeoBundle 'airblade/vim-rooter'
+let g:rooter_patterns = ['tags', '.git', '.git/']
+
+
 "Let NeoBundle manage NeoBundle
 " Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
