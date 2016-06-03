@@ -79,9 +79,8 @@ if has('vim_starting')
     set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
-" Required:
-call neobundle#rc(expand('~/.vim/bundle/'))
-
+" Required:0\
+call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundle 'mhinz/vim-startify'             " Nice start screen
 let g:startify_bookmarks = ['~/.vimrc',]
 let g:startify_change_to_dir = 0
@@ -97,11 +96,12 @@ let g:rooter_patterns = ['tags', '.git', '.git/']
 NeoBundleFetch 'Shougo/neobundle.vim'
 
 if has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
+    NeoBundle 'Shougo/neocomplete'
     " Use NeoComplete
     " ---------------
     let g:neocomplete#enable_at_startup              = 1
 "    let g:neocomplete#force_overwrite_completefunc   = 1
-    let g:neocomplete#data_directory                 = '~/.vim/neocomplcache'
+    let g:neocomplete#data_directory                 = '~/.cache/neocomplcache'
 
     let g:neocomplete#auto_completion_start_length   = 1
     let g:neocomplete#manual_completion_start_length = 0
@@ -123,6 +123,16 @@ if has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
     let g:neocomplete#same_filetypes.gitconfig = '_'
     let g:neocomplete#same_filetypes._         = '_'
 
+    " Python Jedi
+    NeoBundle "davidhalter/jedi-vim"
+    
+"    let g:jedi#completions_enabled = 0
+    let g:jedi#auto_vim_configuration = 0
+    let g:jedi#smart_auto_mappings = 0
+    let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+                                                        " alternative pattern: '\h\w*\|[^. \t]\.\w*'
+
+
     " For perlomni.vim setting.
     NeoBundle "c9s/perlomni.vim"
 
@@ -142,21 +152,13 @@ if has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
 "            \ 'perl': g:home . '/.vim/dict/perl.dict'
 "            \ }
 
-    function! s:my_cr_function()
-      return neocomplete#close_popup() . "\<CR>"
-    endfunction
-
-    NeoBundle 'Shougo/neocomplete'
-"    NeoBundle 'Shougo/neosnippet'
-"    NeoBundle 'Shougo/neosnippet-snippets'
 
     inoremap <expr><C-g>     neocomplete#undo_completion()
     inoremap <expr><C-l>     neocomplete#complete_common_string()
-    inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
     inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-    inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-    inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-    inoremap <expr><C-y>  neocomplete#close_popup()
+"    inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+"    inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+"    inoremap <expr><C-y>  neocomplete#close_popup()
     inoremap <expr><C-e>  neocomplete#cancel_popup()
 else
     " SuperTab option for context aware completion
@@ -189,7 +191,6 @@ if exists('*getmatches')
     let g:syntastic_yaml_checkers         = ['jsyaml']
     NeoBundle 'dbakker/vim-lint'
 endif
-
 NeoBundle 'vim-scripts/The-NERD-tree'
 NeoBundle 'vim-scripts/Tagbar'
 NeoBundle 'bling/vim-airline'
@@ -200,7 +201,7 @@ NeoBundle 'ctags.vim'
 NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/neocomplete.vim'
-
+NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'Shougo/vimproc', {
       \ 'build' : {
       \     'windows' : 'make -f make_mingw32.mak',
@@ -209,8 +210,6 @@ NeoBundle 'Shougo/vimproc', {
       \     'unix' : 'make -f make_unix.mak',
       \    },
       \ }
-" Required:
-filetype plugin indent on
 
 
 
@@ -223,7 +222,6 @@ let g:indentLine_noConcealCursor = 1
 NeoBundle 'altercation/vim-colors-solarized'
 set background=dark 
 let g:solarized_termcolors=256
-colorscheme solarized
 
 if v:version >= 702
     NeoBundle 'bling/vim-airline'
@@ -276,6 +274,12 @@ if has('autocmd')
   autocmd FileType xml           nested setlocal omnifunc=xmlcomplete#CompleteTags
   autocmd FileType pl            nested setlocal omnifunc=perlcomplete#OmniPerl_Complete
 endif
+
+call neobundle#end()
+" Required:
+filetype plugin indent on
+
+colorscheme solarized
 
 nnoremap <F5> :source ~/.vimrc<CR>
 
