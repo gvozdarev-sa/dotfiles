@@ -61,10 +61,23 @@ if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
     esac
 fi
 
+function timer_start {
+    timer=${timer:-$SECONDS}
+}
+
+function timer_stop {
+    timer_show=$(($SECONDS - $timer))
+    unset timer
+}
+
+trap 'timer_start' DEBUG
+
 # some kind of optimization - check if git installed only on config load
 PS1_GIT_BIN=$(which git 2>/dev/null)
 
 function prompt_command {
+    local CODE=$?
+    timer_stop;
     local PS1_GIT=
     local PS1_VENV=
     local GIT_BRANCH=
@@ -114,7 +127,7 @@ function prompt_command {
     else
         # else calculate fillsize
         local fillsize=$(($COLUMNS-$PS1_length))
-        FILL=$color_gray
+        FILL=$color_white
         while [[ $fillsize -gt 0 ]]; do FILL="${FILL}─"; fillsize=$(($fillsize-1)); done
         FILL="${FILL}${color_off}"
     fi
@@ -133,8 +146,16 @@ function prompt_command {
         [[ ! -z $VIRTUAL_ENV ]] && PS1_VENV=" (venv: ${color_blue}${VIRTUAL_ENV#$WORKON_HOME}${color_off})"
     fi
 
+    if $color_is_on; then
+        if [[ $CODE != 0 ]]; then
+            CODE=${color_error}$(printf %d ${CODE})${color_off}
+        else
+            CODE=${color_white}$(printf %d ${CODE})${color_off}
+        fi
+    fi
+
     # set new color prompt
-    PS1="${color_user}${USER}${color_off}@${color_yellow}${HOSTNAME}${color_off}:${color_white}${PWDNAME}${color_off}${PS1_GIT}${PS1_VENV} ${FILL}\n➜ "
+    PS1="#${CODE}, ${timer_show} secs\n${color_user}${USER}${color_off}@${color_yellow}${HOSTNAME}${color_off}:${color_white}${PWDNAME}${color_off}${PS1_GIT}${PS1_VENV} ${FILL}\n# "
 
     # get cursor position and add new line if we're not in first column
     # cool'n'dirty trick (http://stackoverflow.com/a/2575525/1164595)
