@@ -113,8 +113,6 @@ if has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
 
     let g:neocomplete#sources#omni#input_patterns      = {}
     let g:neocomplete#sources#omni#input_patterns.php  = '[^. \t]->\h\w*\|\h\w*::'
-    let g:neocomplete#sources#omni#input_patterns.c    = '[^.[:digit:] *\t]\%(\.\|->\)'
-    let g:neocomplete#sources#omni#input_patterns.cpp  = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 
     let g:neocomplete#force_omni_input_patterns      = {}
     let g:neocomplete#force_omni_input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::\w*'
@@ -123,15 +121,34 @@ if has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
     let g:neocomplete#same_filetypes.gitconfig = '_'
     let g:neocomplete#same_filetypes._         = '_'
 
+
+    " C/C++ clang
+    NeoBundle "Rip-Rip/clang_complete"
+    let g:neocomplete#sources#omni#input_patterns.c    = '[^.[:digit:] *\t]\%(\.\|->\)'
+    let g:neocomplete#sources#omni#input_patterns.cpp  = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+    let g:clang_compilation_database = '../build'
+    let g:clang_auto = 0
+    let g:clang_c_completeopt = 'menuone,preview'
+    let g:clang_cpp_completeopt = 'menuone,preview'
+
+
     " Python Jedi
     NeoBundle "davidhalter/jedi-vim"
-    
 "    let g:jedi#completions_enabled = 0
     let g:jedi#auto_vim_configuration = 0
     let g:jedi#smart_auto_mappings = 0
     let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
                                                         " alternative pattern: '\h\w*\|[^. \t]\.\w*'
 
+    " Rust support
+    NeoBundle 'rust-lang/rust.vim'
+
+    NeoBundle 'racer-rust/vim-racer'
+
+"    let g:racer_cmd = "<path-to-racer>/target/release/racer"
+"    let _home = $HOME
+    let $RUST_SRC_PATH=  "/home/fad/PROG/tools/rustc-src/src"
+    let g:racer_experimental_completer = 1
 
     " For perlomni.vim setting.
     NeoBundle "c9s/perlomni.vim"
@@ -187,8 +204,19 @@ if exists('*getmatches')
     let g:syntastic_xslt_checkers         = ['xmllint']
     let g:syntastic_enable_perl_checker = 1
     let g:syntastic_perl_checkers         = ['perl']
+    let g:syntastic_python_checkers         = ['pyflakes']
     " npm install js-yaml
     let g:syntastic_yaml_checkers         = ['jsyaml']
+
+    let g:syntastic_c_checkers            = ['clang_check', 'clang_tidy']
+    let g:syntastic_c_clang_check_post_args = ""
+    let g:syntastic_c_clang_tidy_post_args = ""
+
+    let g:syntastic_cpp_checkers            = ['clang_check', 'clang_tidy']
+    let g:syntastic_cpp_clang_check_post_args = ""
+    let g:syntastic_cpp_clang_tidy_post_args = ""
+
+
     NeoBundle 'dbakker/vim-lint'
 endif
 NeoBundle 'vim-scripts/The-NERD-tree'
