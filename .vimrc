@@ -55,7 +55,7 @@ set isprint=@,128-255
 set langmap=бA,вB,гC,дD,еE,жF,зG,иH,йI,кJ,лK,мL,нM,оN,пO,рP,сQ,тR,уS,фT,хU,цV,чW,шX,щY,ъZ,Бa,Вb,Гc,Дd,Еe,Жf,Зg,Иh,Йi,Кj,Лk,Мl,Нm,Оn,Пo,Рp,Сq,Тr,Уs,Фt,Хu,Цv,Чw,Шx,Щy,Ъz,Ы\[,ы\{,Э\],э\}
 set laststatus=2
 set scrolljump=0
-set shelltype=4
+"set shelltype=4
 set shiftround
 set shiftwidth=4
 set shortmess=mrntl
@@ -95,7 +95,34 @@ let g:rooter_patterns = ['tags', '.git', '.git/']
 " Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-if has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
+if has("nvim")
+    if has("python3")
+        NeoBundle 'arakashic/chromatica.nvim'
+        let g:chromatica#enable_at_startup=1
+        let g:chromatica#highlight_feature_level=1
+
+        "set to 0 if slow
+        let g:chromatica#responsive_mode=1
+
+        NeoBundle "Shougo/deoplete.nvim"
+        let g:deoplete#enable_at_startup = 1
+        inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
+        let g:deoplete#omni_patterns = {}
+
+        " C/C++ clang
+        NeoBundle "Rip-Rip/clang_complete"
+        let g:deoplete#omni_patterns.c      = '[^.[:digit:] *\t]\%(\.\|->\)'
+        let g:deoplete#omni_patterns.cpp    = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+
+        let g:clang_compilation_database = '../build'
+        let g:clang_auto = 0
+        let g:clang_c_completeopt = 'menuone,preview'
+        let g:clang_cpp_completeopt = 'menuone,preview'
+    endif
+    "NeoBundle 'critiqjo/lldb.nvim'
+
+elseif has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
     NeoBundle 'Shougo/neocomplete'
     " Use NeoComplete
     " ---------------
@@ -126,7 +153,7 @@ if has("lua") && (v:version > 703 || (v:version == 703 && has("patch885")))
     NeoBundle "Rip-Rip/clang_complete"
     let g:neocomplete#sources#omni#input_patterns.c    = '[^.[:digit:] *\t]\%(\.\|->\)'
     let g:neocomplete#sources#omni#input_patterns.cpp  = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-    let g:clang_compilation_database = '../build'
+    "let g:clang_compilation_database = '../build'
     let g:clang_auto = 0
     let g:clang_c_completeopt = 'menuone,preview'
     let g:clang_cpp_completeopt = 'menuone,preview'
@@ -211,14 +238,29 @@ if exists('*getmatches')
     let g:syntastic_c_checkers            = ['clang_check', 'clang_tidy']
     let g:syntastic_c_clang_check_post_args = ""
     let g:syntastic_c_clang_tidy_post_args = ""
+    let g:syntastic_c_clang_tidy_args = "-checks=llvm-*,modernize-*,"
 
     let g:syntastic_cpp_checkers            = ['clang_check', 'clang_tidy']
     let g:syntastic_cpp_clang_check_post_args = ""
     let g:syntastic_cpp_clang_tidy_post_args = ""
+    let g:syntastic_cpp_clang_tidy_args = "-checks=-*,llvm-*,modernize-*,misc-*"
 
 
     NeoBundle 'dbakker/vim-lint'
 endif
+
+"clang-format
+NeoBundle "rhysd/vim-clang-format"
+let g:clang_format#code_style = "llvm"
+
+" map to <Leader>cf in C++ code
+autocmd FileType c,cpp,objc nnoremap <buffer><Leader>f :<C-u>ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer><Leader>f :ClangFormat<CR>
+
+
+map <Leader>h :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+
+
 NeoBundle 'vim-scripts/The-NERD-tree'
 NeoBundle 'vim-scripts/Tagbar'
 NeoBundle 'bling/vim-airline'
@@ -227,9 +269,15 @@ NeoBundle 'vim-scripts/vcscommand.vim'
 NeoBundle 'vim-scripts/trailing-whitespace'
 NeoBundle 'ctags.vim'
 NeoBundle 'Shougo/neomru.vim'
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/neocomplete.vim'
+
+if has("python3")
+    NeoBundle 'Shougo/denite.nvim'
+else
+    NeoBundle 'Shougo/unite.vim'
+endif
 NeoBundle 'airblade/vim-gitgutter'
+let g:gitgutter_sign_column_always = 1
+
 NeoBundle 'Shougo/vimproc', {
       \ 'build' : {
       \     'windows' : 'make -f make_mingw32.mak',
@@ -247,9 +295,13 @@ let g:indentLine_char = "│"
 let g:indentLine_noConcealCursor = 1
 
 " The only theme worth knowing.
-NeoBundle 'altercation/vim-colors-solarized'
+"NeoBundle 'altercation/vim-colors-solarized'
+
+NeoBundle 'iCyMind/NeoSolarized'
 set background=dark 
-let g:solarized_termcolors=256
+set termguicolors
+"let g:solarized_termcolors=256
+let g:gitgutter_override_sign_column_highlight = 0
 
 if v:version >= 702
     NeoBundle 'bling/vim-airline'
@@ -307,7 +359,7 @@ call neobundle#end()
 " Required:
 filetype plugin indent on
 
-colorscheme solarized
+colorscheme NeoSolarized
 
 nnoremap <F5> :source ~/.vimrc<CR>
 
